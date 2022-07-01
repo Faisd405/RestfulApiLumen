@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Book;
+use App\Services\BookServices;
 
 class BookController extends Controller
 {
 
     protected $book;
+    protected $bookServices;
 
-    public function __construct(Book $book)
+    public function __construct(Book $book, BookServices $bookServices)
     {
         $this->book = $book;
+        $this->bookServices = $bookServices;
     }
 
     public function checkAuth()
@@ -46,6 +49,10 @@ class BookController extends Controller
             'publisher' => 'required',
             'description' => 'required',
         ]);
+
+        if ($request->hasFile('image')){
+            $this->bookServices->uploadImage($request);
+        }
 
         if ($validator->fails()) {
             return response()->json([
